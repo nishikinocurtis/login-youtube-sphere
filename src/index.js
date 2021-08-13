@@ -1,12 +1,39 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import AuthingDialog from './App';
 import reportWebVitals from './reportWebVitals';
+import ProfileIndex from "./ProfileIndex";
+import axios from 'axios';
+
+const mockSync = (user) => {
+    console.log(user);
+}
+const actualSync = (user) => {
+    const baseURL = "https://social.qmcurtis.me/api/"
+    const config = {
+        method: 'post',
+        baseURL: "https://aws.nicegoodthings.com/",
+        timeout: 36000,
+        responseType: 'json',
+        data: {
+            userId: user.id,
+            nickname: user.username || "",
+            liked: ""
+        },
+        url: "/user"
+    }
+    console.log(config);
+    axios.request(config).then((response) => {
+        console.log(response);
+    }).catch((err) => {
+        console.log("axios err external register", err);
+    })
+}
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+      <ProfileIndex serverSync={actualSync}/>
   </React.StrictMode>,
   document.getElementById('root')
 );
