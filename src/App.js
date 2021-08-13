@@ -5,6 +5,7 @@ import {useLanguage} from "uselanguage";
 import {AuthingGuard, useAuthing} from "@authing/react-ui-components";
 import {appId, appHost, guardConfig} from "./config";
 import '@authing/react-ui-components/lib/index.min.css'
+import {createUserRequest} from "./api/request"
 
 function AuthingDialog({serverSync, toggleDialog}) {
     const [guardOpen, setGuardOpen] = useState(true);
@@ -16,6 +17,7 @@ function AuthingDialog({serverSync, toggleDialog}) {
     const handleGuardLoaded = async (authClient) => {
         currAuthClient.current = authClient;
         const currUser = await authClient.getCurrentUser();
+        console.log("loaded: "+currUser)
         if (currUser) {
             if (process.env.REACT_APP_CHROME_EXT == 'true') {
                 chrome.storage.local.set({infraUser: currUser}, () => {
@@ -23,6 +25,16 @@ function AuthingDialog({serverSync, toggleDialog}) {
                 })
             }
             console.log(currUser);
+            let data = {
+                type: "FROM_PAGE",
+                text: "login",
+                user: currUser
+            };
+            await createUserRequest(currUser.id,currUser.nickname??currUser.username).then((response)=>{
+                console.log(response.data)
+            })
+            await window.postMessage(data, "*");
+            console.log("message sent");
             setGuardOpen(false);
             setUser(currUser);
             toggleDialog();
@@ -38,6 +50,9 @@ function AuthingDialog({serverSync, toggleDialog}) {
             text: "login",
             user: user
         };
+        await createUserRequest(user.id,user.nickname??user.username).then((response)=>{
+            console.log(response.data)
+        })
         await window.postMessage(data, "*");
         console.log("message sent");
         setGuardOpen(false);
