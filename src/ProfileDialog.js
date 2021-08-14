@@ -39,6 +39,7 @@ export default function ProfileDialog({ closeDialog }) {
     const handleLogout = async () => {
         if (confirm("Sure to Log Out?")) {
             await authClient.logout();
+            console.log("log out")
             if (process.env.REACT_APP_CHROME_EXT == 'true') {
                 chrome.storage.local.set({infraUser: ''})
             }
